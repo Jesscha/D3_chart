@@ -1,0 +1,876 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chart display</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <style>
+        /* * {
+            outline: 1px solid rgba(0, 0, 255, 0.4);
+        }
+       */
+        .nav-link {
+            color: #333;
+        }
+
+        .nav-link.active {
+            color: #007bff;
+        }
+
+        .grid line {
+            stroke: lightgrey;
+            stroke-opacity: 0.7;
+            shape-rendering: crispEdges;
+        }
+
+        .grid path {
+            stroke-width: 0;
+        }
+
+        #mainContent {
+            background-color: rgba(0, 0, 0, 0.1)
+        }
+
+        #main>.container {
+            height: 400px;
+        }
+
+        .zoom {
+            fill: none;
+            cursor: move;
+            pointer-events: all;
+        }
+
+        .line {
+            fill: none;
+            stroke: rgba(0, 0, 255, 0.4);
+            stroke-width: 3px;
+            clip-path: url(#clip);
+        }
+
+        .subLine {
+            fill: none;
+            stroke: rgba(0, 0, 0, 0.6);
+            stroke-width: 3px;
+            clip-path: url(#clip);
+        }
+
+        #circle {
+            clip-path: url(#clip);
+        }
+
+        svg {
+            cursor: pointer;
+        }
+
+        .toolRect {
+            pointer-events: none;
+            fill: rgba(0, 0, 0, 0.8);
+            width: 80px;
+            height: 28px;
+        }
+
+        .axis--y path {
+            display: none;
+        }
+
+        .subLine {
+            transform: translate(0, 300)
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+        <a href="#" class="navbar-brand text-center col-sm-3 col-md-2 mr-0">C L O A</a>
+        <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+        <ul class="navbar-nav px-3">
+            <li class="nav-item text-nowrap">
+                <a class="nav-link" href="#">sign out</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="container-fluid pt-5">
+        <div class="row">
+            <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+                <div class="sidebar-sticky">
+                    <ul class="nav flex-column pt-3">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="feather feather-home">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                </svg> Dashboard
+                                <span class="sr-only">(current)</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="feather feather-file">
+                                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                                    <polyline points="13 2 13 9 20 9"></polyline>
+                                </svg> Orders
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="feather feather-shopping-cart">
+                                    <circle cx="9" cy="21" r="1"></circle>
+                                    <circle cx="20" cy="21" r="1"></circle>
+                                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                </svg> Products
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="feather feather-users">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg> Customers
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="feather feather-bar-chart-2">
+                                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                                </svg> Reports
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="feather feather-layers">
+                                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                    <polyline points="2 17 12 22 22 17"></polyline>
+                                    <polyline points="2 12 12 17 22 12"></polyline>
+                                </svg> Integrations
+                            </a>
+                        </li>
+                    </ul>
+                    <h6
+                        class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                        <span>Saved reports</span>
+                        <a href="#" class="d-flex align-items-center text-muted">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="feather feather-plus-circle">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="16"></line>
+                                <line x1="8" y1="12" x2="16" y2="12"></line>
+                            </svg>
+                        </a>
+                    </h6>
+                    <ul class="nav flex-column mb-2">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="feather feather-file-text">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg> Current Month
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="feather feather-file-text">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg> Last quarter
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="feather feather-file-text">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg> Social engagement
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="feather feather-file-text">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg> Year-end sale
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- 여기서 부터 기능이 연동되어 있는 부분 -->
+                    <div class="m-3">
+                        <input type="button" class="btn btn-sm btn-outline-secondary d-block" value="10Min"
+                            onclick="scope = 600000">
+                        <input type="button" class="btn btn-sm btn-outline-secondary d-block" value="1Min"
+                            onclick="scope = 60000">
+                        <input type="button" class="btn btn-sm btn-outline-secondary d-block" value="10Second"
+                            onclick="scope = 10000">
+                    </div>
+                </div>
+            </nav>
+            <main id="mainContent" role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+                <div
+                    class="justify-content-between align-items-left pt-3 mt-1 pb-2 mb-3 border-bottom border rounded shadow-sm bg-white">
+                    <div class="flex-d">
+                        <h2 class="pl-2">Main Chart</h2>
+                    </div>
+                    <div id="main" class="mt-0 pt-0 charts">
+                        <div id="mainContainer" class="mt-0 pt-0 container charts d-flex justify-content-center ">
+                            <svg id="mainSvg">
+
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div id="subs" class="mt-3 charts">
+
+                    <div class="container-fluid charts mx-0">
+                        <div class="row justify-content-between charts">
+                            <div id="sub1" class="col-4  charts border rounded shadow-sm bg-white">
+                                <h3 class="pl-1 pt-2">Sub Chart 1</h3>
+                                <svg id="subSvg1">
+                                </svg>
+                            </div>
+                            <div id="sub2" class="col-4  charts border rounded shadow-sm bg-white">
+                                <h3 class="pl-1 pt-2">Sub Chart 2</h3>
+                                <svg id="subSvg2">
+                                </svg>
+                            </div>
+                            <div id="sub3" class="col-4  charts border rounded shadow-sm bg-white">
+                                <h3 class="pl-1 pt-2">Sub Chart 3</h3>
+                                <svg id="subSvg3">
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+
+
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+    <script>
+
+        // ++++++++++++ 비쥬얼라이즈 되는 데이터 관련 설정 +++++++++++++++++++++
+
+
+        // 각 서브 차트에 데이터를 넣기 위한 빈 리스트 생성 
+        let data = []
+        let sub1Data = []
+        let sub2Data = []
+        let sub3Data = []
+
+        // 메인 데이터는 동적으로 변화할 것임 
+        let mainData
+
+        // 툴팁에 나타나는 데이터의 순번 
+        let i
+
+
+
+
+        // 서브차트 축의 길이가 얼마만큼 인지를 밀리세컨드로 표시 
+        let scope = 10000;
+
+        // 데이터 생성 
+        let sub1Handler = setInterval(() => {
+            sub1Data.push({
+                value: ~~(Math.random() * 100),
+                ts: new Date()
+            }
+            )
+
+
+            // 생성된 데이터를 서브 차트1에 보내 차트 업데이트 
+            updateSub1Chart(sub1Data)
+            // 툴팁에 바뀐 위치를 다시 전송
+            selectData(i)
+        }, 1000)
+
+        let sub2Handler = setInterval(() => {
+            sub2Data.push({
+                value: ~~(Math.random() * 100),
+                ts: new Date()
+            }
+            )
+
+            // 생성된 데이터를 서브 차트2에 보내 차트 업데이트 
+            updateSub2Chart(sub2Data)
+            // 툴팁에 바뀐 위치를 다시 전송 
+            selectData(i)
+        }, 1000)
+
+        let sub3Handler = setInterval(() => {
+            sub3Data.push({
+                value: ~~(Math.random() * 100),
+                ts: new Date()
+            }
+            )
+
+            // 생성된 데이터를 서브 차트3에 보내 차트 업데이트 
+            updateSub3Chart(sub3Data)
+            // 툴팁에 바뀐 위치를 다시 전송
+            selectData(i)
+        }, 1000)
+
+
+        // 메인 차트에 표시되는 데이터 변경
+        let handler
+
+        function start1() {
+            clearInterval(handler)
+            handler = setInterval(() => {
+                updateChart(sub1Data)
+                selectData(i)
+            }, 1000);
+            mainData = sub1Data;
+            focus_sub1.select('.subLine').style("stroke", "rgba(0,0,255,0.4)")
+            focus_sub2.select('.subLine').style("stroke", "rgba(0,0,0,0.4)")
+            focus_sub3.select('.subLine').style("stroke", "rgba(0,0,0,0.4)")
+
+        }
+
+        function start2() {
+            clearInterval(handler)
+            handler = setInterval(() => {
+                updateChart(sub2Data)
+                selectData(i)
+            }, 1000);
+            mainData = sub2Data;
+            focus_sub1.select('.subLine').style("stroke", "rgba(0,0,0,0.4)")
+            focus_sub2.select('.subLine').style("stroke", "rgba(0,0,255,0.4)")
+            focus_sub3.select('.subLine').style("stroke", "rgba(0,0,0,0.4)")
+
+        }
+
+        function start3() {
+            clearInterval(handler)
+            handler = setInterval(() => {
+                updateChart(sub3Data)
+                selectData(i)
+            }, 1000);
+            mainData = sub3Data;
+            focus_sub1.select('.subLine').style("stroke", "rgba(0,0,0,0.4)")
+            focus_sub2.select('.subLine').style("stroke", "rgba(0,0,0,0.4)")
+            focus_sub3.select('.subLine').style("stroke", "rgba(0,0,255,0.4)")
+
+        }
+
+
+
+        //++++++++++++++++++++++++++++ 그래프 관련 코드 +++++++++++++++++++++++++++++++
+
+
+        //  ** 메인 차트 ** 
+        // 그래프 포지션 관련 변수 설정 
+        // 메인 SVG 크기 , 차트 크기, 마진 크기 설정 
+        let mainSvgWidth = 1000,
+            mainSvgHeight = 400;
+
+        let mainChartWidth = 1000,
+            mainChartHeight = 270,
+            mainChartHeight2 = mainChartHeight / 10;
+
+        let margin = { top: 10, right: 20, bottom: 20, left: 20 },
+            margin2 = { top: 310, right: 20, bottom: 20, left: 20 };
+
+
+        // 스케일에 도메인은 넣지않고 range만 넣어둔 설정을 하여 추후 도메인 업데이트 만으로 해당 스케일로 변화된 데이터를 나타낼수 있다. 
+        let x = d3.scaleTime().range([0, mainChartWidth]),
+            x2 = d3.scaleTime().range([0, mainChartWidth]),
+            y = d3.scaleLinear().range([mainChartHeight, 0]),
+            y2 = d3.scaleLinear().range([mainChartHeight2, 0]);
+
+        // 위의 스케일이 적용된 축을 만들기 위한 축 변수 설정 
+        let xAxis = d3.axisBottom(x).ticks(5),
+            xAxis2 = d3.axisBottom(x2),
+            yAxis = d3.axisLeft(y).ticks(5);
+
+        // 위 축이 반영된 라인을 만들기 위한 라인 변수 설저 
+        let line = d3.line().curve(d3.curveCatmullRomOpen).x((d) => x(d.ts)).y((d) => y(d.value))
+        let line2 = d3.line().curve(d3.curveCatmullRomOpen).x((d) => x2(d.ts)).y((d) => y2(d.value))
+
+        // 메인 svg 크기 적용 및 mainsvg라는 변수 생성 
+
+        let mainSvg = d3.select('#mainSvg')
+            .attr("width", mainSvgWidth)
+            .attr("height", mainSvgHeight)
+
+        // 메인 svg를 위한 clip 패쓰 설정, 
+        // 크기를 차트 크기와 같게 해서 차트가 줌이 되더라도 넘치지 않게 한다.  
+
+        let clip = mainSvg
+            .append("defs")
+            .append("clipPath")
+            .attr("id", "clip")
+            .append("rect")
+            .attr("width", mainChartWidth)
+            .attr("height", mainChartHeight * 3)
+            .attr("transform", `translate(0,-20)`)
+
+        // 메인 차트를 만들기 위해 DOM엘리먼트 삽입 및 변수 생성
+
+        let focus = mainSvg.append("g")
+            .attr("class", "focus")
+            .attr("transform", `translate(${margin.left},${margin.top})`)
+
+        let context = mainSvg
+            .append("g")
+            .attr("class", "context")
+            .attr("transform", `translate(${margin2.left},${margin2.top})`)
+
+        focus.append("path")
+            .datum(data)
+            .attr("transform", `translate(0,${margin.top})`)
+            .attr("class", "line")
+
+
+        focus.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", `translate(0,${margin.top + mainChartHeight})`)
+            .call(xAxis)
+
+        focus.append("g")
+            .attr("class", "axis axis--y")
+            .attr("transform", `translate(0,${margin.top})`)
+            .call(yAxis)
+
+        focus.append("g")
+            .attr("class", "grid grid--y")
+            .attr("transform", `translate(0,${margin.top})`)
+            .call(make_y_gridlines().tickSize(-mainChartWidth).tickFormat(""))
+
+        context.append("path")
+            .datum(data)
+            .attr("class", "line")
+
+
+        // 주어진 데이터를 메인차트에 업데이트 한다. 
+
+        function updateChart(mainData) {
+            x2.domain(d3.extent(mainData, (d) => d.ts))
+            y2.domain([0, d3.max(mainData, (d) => d.value)])
+            context.select('.line').datum(mainData).attr('d', line2)
+
+            let bRect = d3.select('.selection')
+
+            let brushedExtent = [+bRect.attr("x"), +bRect.attr("x") + Number(bRect.attr("width"))]
+
+            x.domain(brushedExtent.map(x2.invert, x2))
+            y.domain([0, d3.max(mainData, (d) => d.value)])
+            focus.select('.grid--y')
+                .call(make_y_gridlines().tickSize(-mainChartWidth).tickFormat(""))
+
+            focus.select(".line").datum(mainData).attr("d", line);
+            focus.select(".axis--x").call(xAxis);
+            focus.select(".axis--y").call(yAxis);
+        }
+
+        // **서브차트 1 ** 
+
+        // 크기 설정 
+        let sub1SvgWidth = 600,
+            sub1SvgHeight = 300;
+
+        let sub1ChartWidth = 400,
+            sub1ChartHeight = 250;
+        //  변수 설정 
+        let x_sub1 = d3.scaleTime().range([0, sub1ChartWidth]),
+            y_sub1 = d3.scaleLinear().range([sub1ChartHeight, 0]);
+
+        let xAxis_sub1 = d3.axisBottom(x_sub1).ticks(5),
+            yAxis_sub1 = d3.axisLeft(y_sub1).ticks(5);
+
+        let line_sub1 = d3.line().curve(d3.curveCatmullRomOpen).x((d) => x_sub1(d.ts)).y((d) => y_sub1(d.value))
+
+
+        // 서브 차트1을 위한 엘리먼트 삽입
+
+        let sub1Svg = d3.select('#subSvg1')
+            .attr("width", sub1SvgWidth)
+            .attr("height", sub1SvgHeight)
+
+        let focus_sub1 = sub1Svg.append("g")
+            .attr("class", "focus_sub1")
+            .attr("transform", `translate(${margin.left},${margin.top})`)
+
+        x_sub1.domain(d3.extent(sub1Data, (d) => d.ts))
+        y_sub1.domain([0, d3.max(sub1Data, (d) => d.value)])
+
+        focus_sub1.append("path")
+            .datum(sub1Data)
+            .attr("transform", `translate(0,${margin.top})`)
+            .attr("class", "subLine")
+            .attr("d", line_sub1);
+
+        focus_sub1.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", `translate(0,${margin.top + sub1ChartHeight})`)
+            .style("display", "none")
+            .call(xAxis_sub1)
+
+        focus_sub1.append("g")
+            .attr("class", "axis axis--y")
+            .attr("transform", `translate(0,${margin.top})`)
+            .style("display", "none")
+            .call(yAxis_sub1)
+
+        // 메인 차트 y축에 줄 5개 짜리 선을 긋기 위한 함수 
+        function make_y_gridlines() {
+            return d3.axisLeft(y)
+                .ticks(5)
+        }
+
+
+        // 서브차트 1 업데이트 
+
+        function updateSub1Chart(sub1Data) {
+
+            let maxts = d3.max(sub1Data, (d) => d.ts)
+            let filteredData = sub1Data.filter(c => c.ts > maxts - scope)
+
+            x_sub1.domain(d3.extent(filteredData, (d) => d.ts))
+            y_sub1.domain([0, d3.max(filteredData, (d) => d.value)])
+            focus_sub1.select('.subLine').attr('d', line_sub1)
+            focus_sub1.select(".axis--x").call(xAxis_sub1);
+            focus_sub1.select(".axis--y").call(yAxis_sub1);
+        }
+        // **서브차트2 ** 
+
+        // 크기를 서브차트 1과 일치시킨다. 
+        let sub2SvgWidth = sub1SvgWidth,
+            sub2SvgHeight = sub1SvgHeight;
+
+        let sub2ChartWidth = sub1ChartWidth,
+            sub2ChartHeight = sub1ChartHeight;
+
+        // 변수 설정 
+        let x_sub2 = d3.scaleTime().range([0, sub2ChartWidth])
+        let y_sub2 = d3.scaleLinear().range([sub2ChartHeight, 0])
+
+        let xAxis_sub2 = d3.axisBottom(x_sub2).ticks(5),
+            yAxis_sub2 = d3.axisLeft(y_sub2);
+
+        let line_sub2 = d3.line().curve(d3.curveCatmullRomOpen).x((d) => x_sub2(d.ts)).y((d) => y_sub2(d.value))
+
+        // 서브차트 2를 위한 엘리먼트 설정 
+        let sub2Svg = d3.select('#subSvg2')
+            .attr("width", sub2SvgWidth)
+            .attr("height", sub2SvgHeight)
+
+        let focus_sub2 = sub2Svg.append("g")
+            .attr("class", "focus_sub2")
+            .attr("transform", `translate(${margin.left},${margin.top})`)
+
+        x_sub2.domain(d3.extent(sub2Data, (d) => d.ts))
+        y_sub2.domain([0, d3.max(sub2Data, (d) => d.value)])
+
+        focus_sub2.append("path")
+            .datum(sub2Data)
+            .attr("transform", `translate(0,${margin.top})`)
+            .attr("class", "subLine")
+            .attr("d", line_sub2);
+
+        focus_sub2.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", `translate(0,${margin.top + sub2ChartHeight})`)
+            .style("display", "none")
+            .call(xAxis_sub2)
+
+        focus_sub2.append("g")
+            .attr("class", "axis axis--y")
+            .attr("transform", `translate(0,${margin.top})`)
+            .style("display", "none")
+            .call(yAxis_sub2)
+
+        // 서브차트 2 업데이트 
+        function updateSub2Chart(sub2Data) {
+            let maxts = d3.max(sub1Data, (d) => d.ts)
+
+            let filteredData = sub2Data.filter(c => c.ts > maxts - scope)
+            x_sub2.domain(d3.extent(filteredData, (d) => d.ts))
+            y_sub2.domain([0, d3.max(filteredData, (d) => d.value)])
+            focus_sub2.select('.subLine').attr('d', line_sub2)
+            focus_sub2.select(".axis--x").call(xAxis_sub2);
+            focus_sub2.select(".axis--y").call(yAxis_sub2);
+        }
+
+        // **서브 차트 3 ** 
+
+        // 변수 설정 
+        let sub3SvgWidth = sub1SvgWidth,
+            sub3SvgHeight = sub1SvgHeight;
+
+        let sub3ChartWidth = sub1ChartWidth,
+            sub3ChartHeight = sub1ChartHeight;
+
+
+        let x_sub3 = d3.scaleTime().range([0, sub3ChartWidth])
+        let y_sub3 = d3.scaleLinear().range([sub3ChartHeight, 0])
+
+        let xAxis_sub3 = d3.axisBottom(x_sub3).ticks(5),
+            yAxis_sub3 = d3.axisLeft(y_sub3);
+
+        let line_sub3 = d3.line().curve(d3.curveCatmullRomOpen).x((d) => x_sub3(d.ts)).y((d) => y_sub3(d.value))
+
+        // 엘리먼트 삽입 
+
+        let sub3Svg = d3.select('#subSvg3')
+            .attr("width", sub3SvgWidth)
+            .attr("height", sub3SvgHeight)
+
+        let focus_sub3 = sub3Svg.append("g")
+            .attr("class", "focus_sub3")
+            .attr("transform", `translate(${margin.left},${margin.top})`)
+
+        x_sub3.domain(d3.extent(sub3Data, (d) => d.ts))
+        y_sub3.domain([0, d3.max(sub3Data, (d) => d.value)])
+
+        focus_sub3.append("path")
+            .datum(sub3Data)
+            .attr("transform", `translate(0,${margin.top})`)
+            .attr("class", "subLine")
+            .attr("d", line_sub3);
+
+        focus_sub3.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", `translate(0,${margin.top + sub3ChartHeight})`)
+            .style("display", "none")
+            .call(xAxis_sub3)
+
+        focus_sub3.append("g")
+            .attr("class", "axis axis--y")
+            .attr("transform", `translate(0,${margin.top})`)
+            .style("display", "none")
+            .call(yAxis_sub3)
+
+        // 서브차트 3 업데이트 
+
+
+        x_sub3.domain(d3.extent(sub3Data, (d) => d.ts))
+        y_sub3.domain([0, d3.max(sub3Data, (d) => d.value)])
+
+        focus_sub3.append("path")
+            .datum(sub3Data)
+            .attr("transform", `translate(0,${margin.top})`)
+            .attr("class", "subLine")
+            .attr("d", line_sub3);
+
+        focus_sub3.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", `translate(0,${margin.top + sub3ChartHeight})`)
+            .style("display", "none")
+            .call(xAxis_sub3)
+
+        focus_sub3.append("g")
+            .attr("class", "axis axis--y")
+            .attr("transform", `translate(0,${margin.top})`)
+            .style("display", "none")
+            .call(yAxis_sub3)
+
+        function updateSub3Chart(sub3Data) {
+            let maxts = d3.max(sub3Data, (d) => d.ts)
+
+            let filteredData = sub3Data.filter(c => c.ts > maxts - scope)
+            x_sub3.domain(d3.extent(filteredData, (d) => d.ts))
+            y_sub3.domain([0, d3.max(filteredData, (d) => d.value)])
+            focus_sub3.select('.subLine').attr('d', line_sub3)
+            focus_sub3.select(".axis--x").call(xAxis_sub3);
+            focus_sub3.select(".axis--y").call(yAxis_sub3);
+        }
+
+        // +++++++++++++++++++++++++++++++++++++Interaction 관련 코드 ++++++++++++++++++++++++++++++++=
+        // ** 브러시 **
+        // 브러시를 위한 범위 설정 
+
+        let brush = d3.brushX()
+            .extent([[0, 0], [mainChartWidth, mainChartHeight2]])
+            .on("brush end", brushed)
+
+        // 브러시 삽입
+        context.append("g")
+            .attr("transform", `translate(0,0)`)
+            .attr("class", "brush")
+            .call(brush)
+            .call(brush.move, x.range())
+
+        // ** 줌 ** 
+        // 줌 범위 설정 
+        let zoom = d3.zoom()
+            .scaleExtent([1, Infinity])
+            .translateExtent([[0, 0], [mainChartWidth, mainChartHeight]])
+            .extent([[0, 0], [mainChartWidth, mainChartHeight]])
+            .on("zoom", zoomed)
+        // 줌 되는 위치 삽입 
+        mainSvg.append("rect")
+            .attr("class", "zoom")
+            .attr("width", mainChartWidth)
+            .attr("height", mainChartHeight)
+            .attr("transform", `translate(${margin.left},${margin.top})`)
+            .call(zoom)
+
+
+        // 툴팁 상자 및 텍스트를 SVG안에 삽입 
+        let toolGroup = mainSvg.append("g").attr("id", "toolGroup")
+        let toolRect = toolGroup.append("rect")
+            .attr("class", "toolRect")
+            .attr("rx", "5")
+            .attr("ry", "15")
+            .style("opacity", 0);
+
+        let toolText = toolGroup.append("text")
+            .attr("class", "toolText")
+            .style("opacity", 0);
+
+        let toolTs = toolGroup.append("circle")
+            .attr("class", "toolTs")
+            .style("opacity", 0);
+
+        // 포커스를 위한 동그라미 삽입 
+
+        let circle = mainSvg.append('circle')
+            .style("fill", "#6466F9")
+            .attr("stroke", "#6466F9")
+            .attr("id", "circle")
+            .attr('r', 5.5)
+            .style("display", 'none')
+
+        // 브러시 할때 발생하는 일 정의 
+        function brushed() {
+            if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return;
+
+            let s = d3.event.selection || x2.range();
+
+            x.domain(s.map(x2.invert, x2));
+
+            focus.select(".line").attr("d", line);
+            focus.select(".axis--x").call(xAxis);
+            focus.select(".axis--y").call(yAxis);
+            // 브러시와 줌을 동일하게 만듦 
+            // mainSvg.select(".zoom").call(zoom.transform,
+            //         d3.zoomIdentity.scale(chartwidth / (s[1] - s[0])).translate(-s[0], 0))
+        }
+
+        // 줌 할때 발생하는 일 정의 
+        function zoomed() {
+            if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return;
+
+            let t = d3.event.transform;
+            x.domain(t.rescaleX(x2).domain())
+            focus.select(".line").attr("d", line);
+            focus.select(".axis--x").call(xAxis);
+
+            // 줌과 브러시 위치를 동일하게 만듦
+            context.select(".brush").call(brush.move, x.range().map(t.invertX, t))
+        }
+        // ** 툴팁 **
+        // 기능 삽입 
+        mainSvg.on('mousemove', findingI)
+
+        // 마우스가 올라간 데이터가 몇번째 데이터인지 계산 
+        function findingI() {
+            let bisect = d3.bisector((d) => d.ts).left
+            let x0 = x.invert(d3.mouse(this)[0] - margin.left)
+            i = bisect(mainData, x0)
+            selectData(i)
+        }
+
+        // 해당 순서의 데이터를 저장하고 넘겨줌
+        function selectData(i) {
+            let selectedData = mainData[i]
+            circleMove(selectedData)
+            showtooltext(selectedData)
+        }
+        // 동그라미를 데이터에 맞는위치로 이동 
+
+        function circleMove(selectedData) {
+            let circle = d3.select("#circle")
+                .attr("cx", x(selectedData.ts))
+                .attr("cy", y(selectedData.value))
+                .style("opacity", 0.7)
+                .attr("transform", `translate(${margin.left},${margin.top * 2})`)
+            circle.style('display', 'flex')
+        }
+
+        // 텍스트와 상자를 데이터에 맞는 위치로 이동 
+        function showtooltext(mainData) {
+            toolRect.transition().duration(200).style("opacity", .9);
+            toolRect
+                .attr("x", x(mainData.ts))
+                .attr("y", y(mainData.value) + 20)
+                .style("display", 'flex');
+            toolText.style("opacity", 1)
+                .html(`Value : ${mainData.value}`)
+                .attr("x", x(mainData.ts) + 5)
+                .attr("y", y(mainData.value) + 40)
+                .style("fill", 'white');
+            toolTs.style("opacity", 1)
+                .attr("cx", x2(mainData.ts) + 20)
+                .attr("cy", mainSvgHeight - 65)
+                .attr("r", 5)
+                .style("fill", "rgba(255,0,0,0.4)")
+                ;
+        }
+
+
+        // 클릭시 메인차트 데이터 변경 하도록 하는 기능 
+        sub1Svg.on('click', start1)
+        sub2Svg.on('click', start2)
+        sub3Svg.on('click', start3)
+
+
+
+
+    </script>
+</body>
+
+</html>
